@@ -41,6 +41,8 @@ def problems(text):
         found.append("entry has leading or trailing whitespace")
     if "\n" in text or "\r" in text:
         found.append("entry is not one line")
+    if "\u2028" in text or "\u2029" in text:
+        found.append("entry contains a Unicode line separator")
     for ch in text:
         if unicodedata.category(ch).startswith("C"):
             found.append("entry contains a control character U+%04X" % ord(ch))
@@ -70,6 +72,8 @@ def self_test():
     check("201-character entry is rejected", bool(problems("x" * 201)))
     check("multi-line entry is rejected", bool(problems("one\ntwo")))
     check("carriage return is rejected", bool(problems("one\rtwo")))
+    check("Unicode line separator is rejected", bool(problems("one\u2028two")))
+    check("Unicode paragraph separator is rejected", bool(problems("one\u2029two")))
     check("leading whitespace is rejected", bool(problems(" " + ENTRY)))
     check("trailing whitespace is rejected", bool(problems(ENTRY + " ")))
     check("control character is rejected", bool(problems("a\x07b")))
